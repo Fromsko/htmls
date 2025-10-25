@@ -2,12 +2,9 @@ name: Playwright Screenshot Update
 
 # 触发条件
 on:
-  # 手动触发
   workflow_dispatch:
-  # 定时任务 - 每周一早上8点(UTC)
   schedule:
     - cron: "0 8 * * 1"
-  # Push 到 main 分支时
   push:
     branches:
       - main
@@ -24,12 +21,14 @@ concurrency:
   group: screenshot-update
   cancel-in-progress: true
 
+env:
+  BUN_INSTALL_CACHE: 1
+
 jobs:
   screenshot:
     name: Capture Screenshots with Playwright
     runs-on: ubuntu-latest
     
-    # 权限配置
     permissions:
       contents: write
       pull-requests: write
@@ -39,40 +38,41 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 步骤 2: 设置 Bun 包管理器
+      # 步骤 2: 设置 Bun (v2 - 最新版本)
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
-      # 步骤 3: 安装依赖（使用 bun install）
-      - name: Install dependencies with Bun
+      # 步骤 3: 安装依赖（Bun v2 内置缓存）
+      - name: Install dependencies
         run: bun install --frozen-lockfile
-        env:
-          CI: true
 
-      # 步骤 4: 缓存 Playwright 浏览器
+      # 步骤 4: Playwright 浏览器缓存（高效缓存策略）
       - name: Cache Playwright browsers
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('**/bun.lock') }}
+          path: |
+            ~/.cache/ms-playwright
+            ~/.bun
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
           restore-keys: |
-            ${{ runner.os }}-playwright-
+            ${{ runner.os }}-bun-
 
       # 步骤 5: 安装 Playwright 浏览器
       - name: Install Playwright browsers
         run: bunx playwright install --with-deps chromium
 
-      # 步骤 6: 运行 Playwright 测试
+      # 步骤 6: 运行测试
       - name: Run Playwright tests
         run: bun test
+        timeout-minutes: 15
 
-      # 步骤 7: 更新 README.md
+      # 步骤 7: 更新 README
       - name: Update README with screenshots
         run: bun scripts/update-readme.js
 
-      # 步骤 8: 检查是否有变更
+      # 步骤 8: 检查变更
       - name: Check for changes
         id: git-check
         run: |
@@ -90,7 +90,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       # 步骤 10: 提交和推送
-      - name: Commit and push changes
+      - name: Commit and push
         if: steps.git-check.outputs.no_changes == 'false'
         run: |
           git add -A
@@ -105,6 +105,7 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
+          if-no-files-found: ignore
 
       # 步骤 12: 上传截图
       - name: Upload screenshots
@@ -114,9 +115,10 @@ jobs:
           name: screenshots
           path: screenshots/
           retention-days: 30
+          if-no-files-found: ignore
 
-      # 步骤 13: 生成工作流摘要
-      - name: Generate summary
+      # 步骤 13: 生成摘要
+      - name: Generate workflow summary
         if: always()
         run: |
           echo "## 📸 Playwright Screenshot Update" >> $GITHUB_STEP_SUMMARY
@@ -124,7 +126,8 @@ jobs:
           echo "| 项目 | 详情 |" >> $GITHUB_STEP_SUMMARY
           echo "|------|------|" >> $GITHUB_STEP_SUMMARY
           echo "| 包管理器 | Bun (latest) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Action 版本 | oven-sh/setup-bun@v2 |" >> $GITHUB_STEP_SUMMARY
           echo "| 锁定文件 | bun.lock |" >> $GITHUB_STEP_SUMMARY
+          echo "| 缓存策略 | Bun v2 内置 + Playwright |" >> $GITHUB_STEP_SUMMARY
           echo "| 浏览器 | Chromium |" >> $GITHUB_STEP_SUMMARY
-          echo "| 缓存策略 | Playwright Browser Cache |" >> $GITHUB_STEP_SUMMARY
           echo "| 状态 | ✅ Success |" >> $GITHUB_STEP_SUMMARY
