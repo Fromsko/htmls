@@ -27,7 +27,7 @@ jobs:
   screenshot:
     name: Capture Screenshots with Playwright
     runs-on: ubuntu-latest
-    
+
     # 权限配置
     permissions:
       contents: write
