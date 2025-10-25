@@ -17,7 +17,7 @@ on:
       - "service-worker.js"
       - "tests/**"
       - "package.json"
-      - "package-lock.json"
+      - "bun.lock"
 
 # 并发控制
 concurrency:
@@ -39,51 +39,40 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 步骤 2: 设置 Node.js
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      # 步骤 2: 设置 Bun 包管理器
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
         with:
-          node-version: "18"
-          cache: "npm"
-          cache-dependency-path: "./package-lock.json"
+          bun-version: latest
 
-      # 步骤 3: 验证 package-lock.json
-      - name: Verify package-lock.json
-        run: |
-          if [ ! -f "package-lock.json" ]; then
-            echo "❌ package-lock.json not found!"
-            exit 1
-          fi
-          echo "✅ package-lock.json found"
-
-      # 步骤 4: 安装依赖（使用 npm ci 确保精确版本）
-      - name: Install dependencies
-        run: npm ci
+      # 步骤 3: 安装依赖（使用 bun install）
+      - name: Install dependencies with Bun
+        run: bun install --frozen-lockfile
         env:
           CI: true
 
-      # 步骤 5: 缓存 Playwright 浏览器
+      # 步骤 4: 缓存 Playwright 浏览器
       - name: Cache Playwright browsers
         uses: actions/cache@v3
         with:
           path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/bun.lock') }}
           restore-keys: |
             ${{ runner.os }}-playwright-
 
-      # 步骤 6: 安装 Playwright 浏览器
+      # 步骤 5: 安装 Playwright 浏览器
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+        run: bunx playwright install --with-deps chromium
 
-      # 步骤 7: 运行 Playwright 测试
+      # 步骤 6: 运行 Playwright 测试
       - name: Run Playwright tests
-        run: npm test
+        run: bun test
 
-      # 步骤 8: 更新 README.md
+      # 步骤 7: 更新 README.md
       - name: Update README with screenshots
-        run: node scripts/update-readme.js
+        run: bun scripts/update-readme.js
 
-      # 步骤 9: 检查是否有变更
+      # 步骤 8: 检查是否有变更
       - name: Check for changes
         id: git-check
         run: |
@@ -93,14 +82,14 @@ jobs:
             echo "no_changes=false" >> $GITHUB_OUTPUT
           fi
 
-      # 步骤 10: 配置 Git
+      # 步骤 9: 配置 Git
       - name: Configure Git
         if: steps.git-check.outputs.no_changes == 'false'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      # 步骤 11: 提交和推送
+      # 步骤 10: 提交和推送
       - name: Commit and push changes
         if: steps.git-check.outputs.no_changes == 'false'
         run: |
@@ -108,7 +97,7 @@ jobs:
           git commit -m "chore: update screenshots via Playwright [skip ci]"
           git push
 
-      # 步骤 12: 上传测试报告
+      # 步骤 11: 上传测试报告
       - name: Upload test report
         if: always()
         uses: actions/upload-artifact@v4
@@ -117,7 +106,7 @@ jobs:
           path: playwright-report/
           retention-days: 30
 
-      # 步骤 13: 上传截图
+      # 步骤 12: 上传截图
       - name: Upload screenshots
         if: always()
         uses: actions/upload-artifact@v4
@@ -126,7 +115,7 @@ jobs:
           path: screenshots/
           retention-days: 30
 
-      # 步骤 14: 生成工作流摘要
+      # 步骤 13: 生成工作流摘要
       - name: Generate summary
         if: always()
         run: |
@@ -134,7 +123,8 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| 项目 | 详情 |" >> $GITHUB_STEP_SUMMARY
           echo "|------|------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Node.js | 18.x |" >> $GITHUB_STEP_SUMMARY
+          echo "| 包管理器 | Bun (latest) |" >> $GITHUB_STEP_SUMMARY
+          echo "| 锁定文件 | bun.lock |" >> $GITHUB_STEP_SUMMARY
           echo "| 浏览器 | Chromium |" >> $GITHUB_STEP_SUMMARY
-          echo "| 缓存策略 | npm + Playwright |" >> $GITHUB_STEP_SUMMARY
+          echo "| 缓存策略 | Playwright Browser Cache |" >> $GITHUB_STEP_SUMMARY
           echo "| 状态 | ✅ Success |" >> $GITHUB_STEP_SUMMARY
