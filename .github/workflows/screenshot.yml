@@ -34,9 +34,20 @@ jobs:
       pull-requests: write
 
     steps:
-      # 步骤 1: 检出代码
+      # 步骤 1: 检出代码（禁用 git 缓存，确保获取最新代码）
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 获取完整历史记录
+          clean: true     # 确保工作目录干净
+
+      # 验证检出的代码
+      - name: Verify checkout
+        run: |
+          echo "📋 当前提交: $(git rev-parse HEAD)"
+          echo "📋 当前分支: $(git rev-parse --abbrev-ref HEAD)"
+          echo "📋 最后提交信息: $(git log -1 --pretty=%B)"
+          echo "📋 index.html 最后修改: $(git log -1 --format=%ai -- index.html)"
 
       # 步骤 2: 设置 Bun (v2 - 最新版本)
       - name: Setup Bun
@@ -99,6 +110,8 @@ jobs:
             echo "no_changes=true" >> $GITHUB_OUTPUT
           else
             echo "no_changes=false" >> $GITHUB_OUTPUT
+            echo "📝 检测到文件变更:"
+            git diff --name-only
           fi
 
       # 步骤 11: 配置 Git
@@ -114,7 +127,7 @@ jobs:
         run: |
           git add -A
           git commit -m "chore: 自动更新截图和时间戳 [skip ci]"
-          git push
+          git push origin main
 
       # 步骤 13: 上传测试报告
       - name: Upload test report
