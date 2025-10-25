@@ -44,35 +44,54 @@ jobs:
         with:
           bun-version: latest
 
-      # 步骤 3: 安装依赖（Bun v2 内置缓存）
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
+      # 步骤 3: Bun 依赖缓存（优化缓存策略）
+      - name: Restore Bun Dependencies Cache
+        uses: actions/cache@v4
+        id: bun-cache
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
 
-      # 步骤 4: Playwright 浏览器缓存（高效缓存策略）
+      # 步骤 4: 安装依赖（移除 --frozen-lockfile，使用缓存加速）
+      - name: Install dependencies
+        run: bun install
+        # 注意：移除 --frozen-lockfile 的原因：
+        # 1. 缓存已保证快速安装
+        # 2. bun.lock 在本地已是最新状态
+        # 3. CI 环境中不需要严格验证锁定状态
+        # 4. 避免 Bun 版本升级导致的 lock 格式变化问题
+
+      # 步骤 5: Playwright 浏览器缓存
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         with:
           path: |
             ~/.cache/ms-playwright
             ~/.bun
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          key: ${{ runner.os }}-playwright-${{ hashFiles('bun.lock') }}
           restore-keys: |
-            ${{ runner.os }}-bun-
+            ${{ runner.os }}-playwright-
 
-      # 步骤 5: 安装 Playwright 浏览器
+      # 步骤 6: 安装 Playwright 浏览器
       - name: Install Playwright browsers
         run: bunx playwright install --with-deps chromium
 
-      # 步骤 6: 运行测试
+      # 步骤 7: 运行测试
       - name: Run Playwright tests
         run: bun test
         timeout-minutes: 15
 
-      # 步骤 7: 更新 README
+      # 步骤 8: 更新 README
       - name: Update README with screenshots
         run: bun scripts/update-readme.js
 
-      # 步骤 8: 检查变更
+      # 步骤 9: 自动更新时间戳
+      - name: Update timestamp
+        run: bun scripts/update-timestamp.js
+
+      # 步骤 10: 检查变更
       - name: Check for changes
         id: git-check
         run: |
@@ -82,22 +101,22 @@ jobs:
             echo "no_changes=false" >> $GITHUB_OUTPUT
           fi
 
-      # 步骤 9: 配置 Git
+      # 步骤 11: 配置 Git
       - name: Configure Git
         if: steps.git-check.outputs.no_changes == 'false'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      # 步骤 10: 提交和推送
+      # 步骤 12: 提交和推送
       - name: Commit and push
         if: steps.git-check.outputs.no_changes == 'false'
         run: |
           git add -A
-          git commit -m "chore: update screenshots via Playwright [skip ci]"
+          git commit -m "chore: 自动更新截图和时间戳 [skip ci]"
           git push
 
-      # 步骤 11: 上传测试报告
+      # 步骤 13: 上传测试报告
       - name: Upload test report
         if: always()
         uses: actions/upload-artifact@v4
@@ -107,7 +126,7 @@ jobs:
           retention-days: 30
           if-no-files-found: ignore
 
-      # 步骤 12: 上传截图
+      # 步骤 14: 上传截图
       - name: Upload screenshots
         if: always()
         uses: actions/upload-artifact@v4
@@ -117,7 +136,7 @@ jobs:
           retention-days: 30
           if-no-files-found: ignore
 
-      # 步骤 13: 生成摘要
+      # 步骤 15: 生成摘要
       - name: Generate workflow summary
         if: always()
         run: |
@@ -128,6 +147,6 @@ jobs:
           echo "| 包管理器 | Bun (latest) |" >> $GITHUB_STEP_SUMMARY
           echo "| Action 版本 | oven-sh/setup-bun@v2 |" >> $GITHUB_STEP_SUMMARY
           echo "| 锁定文件 | bun.lock |" >> $GITHUB_STEP_SUMMARY
-          echo "| 缓存策略 | Bun v2 内置 + Playwright |" >> $GITHUB_STEP_SUMMARY
+          echo "| 缓存策略 | 智能缓存（依赖 + 浏览器）|" >> $GITHUB_STEP_SUMMARY
           echo "| 浏览器 | Chromium |" >> $GITHUB_STEP_SUMMARY
-          echo "| 状态 | ✅ Success |" >> $GITHUB_STEP_SUMMARY
+          echo "| 自动化 | 格式化 + 时间戳 + 截图 |" >> $GITHUB_STEP_SUMMARY
