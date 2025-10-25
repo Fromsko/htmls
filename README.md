@@ -269,12 +269,10 @@ Screenshots showing the responsive design across different device sizes.
 ## 📞 联系方式
 
 如有任何问题或建议，欢迎通过以下方式联系：
-- 📧 Email: [your-email@example.com]
-- 💬 GitHub Issues: [创建 Issue](https://github.com/issues)
-- 🐦 Twitter: [@your-twitter]
+- 📧 Email: [hnkong666@gmail.com]
 
 ---
 
-**最后更新**: $(date)  
+**最后更新**: 2025-10-25  
 **版本**: 1.0.0  
 **状态**: ✅ 活跃维护中

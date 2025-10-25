@@ -7,7 +7,10 @@
     "test": "playwright test",
     "test:debug": "playwright test --debug",
     "test:ui": "playwright test --ui",
-    "test:headed": "playwright test --headed"
+    "test:headed": "playwright test --headed",
+    "prepare": "husky install",
+    "lint": "prettier --check .",
+    "format": "prettier --write ."
   },
   "keywords": [
     "ai",
@@ -19,6 +22,14 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@playwright/test": "^1.56.0"
+    "@playwright/test": "^1.56.0",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3"
+  },
+  "lint-staged": {
+    "*.{html,js,json,md}": [
+      "prettier --write"
+    ]
   }
 }
