@@ -27,6 +27,42 @@
         color: #f1f5f9;
       }
 
+      /* ===== 滚动条样式 ===== */
+      /* Webkit 浏览器滚动条 */
+      body::-webkit-scrollbar {
+        width: 10px;
+      }
+
+      body::-webkit-scrollbar-track {
+        background: rgba(15, 23, 42, 0.5);
+        border-radius: 10px;
+      }
+
+      body::-webkit-scrollbar-thumb {
+        background: linear-gradient(
+          180deg,
+          #60a5fa 0%,
+          #34a853 100%
+        );
+        border-radius: 10px;
+        border: 2px solid rgba(15, 23, 42, 0.5);
+      }
+
+      body::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(
+          180deg,
+          #60a5fa 0%,
+          #34a853 100%
+        );
+        box-shadow: 0 0 6px rgba(96, 165, 250, 0.5);
+      }
+
+      /* Firefox 滚动条 */
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: #60a5fa rgba(15, 23, 42, 0.5);
+      }
+
       /* ===== 导航栏样式 ===== */
       nav {
         background: rgba(15, 23, 42, 0.95);
