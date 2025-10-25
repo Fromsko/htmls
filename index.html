@@ -195,16 +195,8 @@
     <div class="max-w-6xl mx-auto px-6 py-16">
       <!-- 主流 AI 工具 -->
       <section id="ai" class="mb-20">
-        <h2
-          class="text-4xl font-bold mb-4"
-        >
-          主流 AI 工具
-        </h2>
-        <p
-          class="text-gray-400 mb-12"
-        >
-          探索最前沿的人工智能工具和平台
-        </p>
+        <h2 class="text-4xl font-bold mb-4">主流 AI 工具</h2>
+        <p class="text-gray-400 mb-12">探索最前沿的人工智能工具和平台</p>
         <div
           id="ai-tools"
           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
@@ -213,16 +205,8 @@
 
       <!-- 主流 UI 框架 -->
       <section id="ui" class="mb-20">
-        <h2
-          class="text-4xl font-bold mb-4"
-        >
-          主流 UI 框架
-        </h2>
-        <p
-          class="text-gray-400 mb-12"
-        >
-          现代化的前端 UI 框架和组件库
-        </p>
+        <h2 class="text-4xl font-bold mb-4">主流 UI 框架</h2>
+        <p class="text-gray-400 mb-12">现代化的前端 UI 框架和组件库</p>
         <div
           id="ui-frameworks"
           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
@@ -231,16 +215,8 @@
 
       <!-- 主流 AI 编辑器 -->
       <section id="editor">
-        <h2
-          class="text-4xl font-bold mb-4"
-        >
-          主流 AI 编辑器
-        </h2>
-        <p
-          class="text-gray-400 mb-12"
-        >
-          智能化的代码编辑工具和开发环境
-        </p>
+        <h2 class="text-4xl font-bold mb-4">主流 AI 编辑器</h2>
+        <p class="text-gray-400 mb-12">智能化的代码编辑工具和开发环境</p>
         <div
           id="ai-editors"
           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
@@ -395,13 +371,9 @@
         if (hasIcon && item.icon) {
           iconHtml = `<img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/${item.icon}.svg" alt="${item.name}" class="brand-icon" />`;
         } else if (item.favicon) {
-          iconHtml = `<img src="" alt="${
-            item.name
-          }" class="brand-icon favicon-icon" data-domain="${
-            item.favicon
-          }" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%2360a5fa%22/><text x=%2250%22 y=%2260%22 font-size=%2245%22 fill=%22white%22 text-anchor=%22middle%22>${item.name.charAt(
-            0
-          )}</text></svg>'" />`;
+          // 直接使用本地 SVG，不需要异步加载
+          const firstChar = item.name.charAt(0).toUpperCase();
+          iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="brand-icon" style="width:40px;height:40px"><circle cx="50" cy="50" r="45" fill="#60a5fa"/><text x="50" y="60" font-size="45" fill="white" text-anchor="middle" font-weight="bold">${firstChar}</text></svg>`;
         }
 
         return `
@@ -439,34 +411,6 @@
         });
       };
 
-      // ===== Favicon 加载模块 =====
-      const loadFavicons = () => {
-        const faviconIcons = document.querySelectorAll(".favicon-icon");
-        faviconIcons.forEach((img) => {
-          const domain = img.dataset.domain;
-          if (!domain) return;
-
-          const faviconApis = [
-            `https://icon.horse/icon/${domain}`,
-            `https://www.google.com/s2/favicons?sz=256&domain=${domain}`,
-            `https://favicons.githubusercontent.com/${domain}`,
-          ];
-
-          let loaded = false;
-          for (const api of faviconApis) {
-            const tempImg = new Image();
-            tempImg.onload = function () {
-              if (!loaded) {
-                img.src = api;
-                loaded = true;
-              }
-            };
-            tempImg.onerror = function () {};
-            tempImg.src = api;
-          }
-        });
-      };
-
       // ===== Service Worker 注册模块 =====
       const registerServiceWorker = () => {
         if ("serviceWorker" in navigator) {
@@ -486,7 +430,6 @@
       // ===== 主初始化函数 =====
       document.addEventListener("DOMContentLoaded", () => {
         initializeDOM();
-        loadFavicons();
         registerServiceWorker();
       });
     </script>
