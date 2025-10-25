@@ -87,7 +87,49 @@ npm run screenshot
 
 <!-- PLAYWRIGHT_SCREENSHOTS_START -->
 
-*截图将由 GitHub Actions 自动生成并更新*
+## 📸 Page Screenshots
+
+### 🏠 Index Page (Main Navigation)
+
+The main navigation center showcasing AI tools, UI frameworks, and AI editors.
+
+#### Index Full.Jpg
+
+![Index Full.Jpg](./screenshots/index-full.jpg)
+
+*Captured with Playwright on: 2025-10-25*
+
+### 💬 Chat Page (Conversation Interface)
+
+The AI chat assistant interface for interactive conversations.
+
+#### Chat Full.Jpg
+
+![Chat Full.Jpg](./screenshots/chat-full.jpg)
+
+*Captured with Playwright on: 2025-10-25*
+
+### 📱 Responsive Design
+
+Screenshots showing the responsive design across different device sizes.
+
+#### Responsive Desktop.Jpg
+
+![Responsive Desktop.Jpg](./screenshots/responsive-desktop.jpg)
+
+*Captured with Playwright on: 2025-10-25*
+
+#### Responsive Mobile.Jpg
+
+![Responsive Mobile.Jpg](./screenshots/responsive-mobile.jpg)
+
+*Captured with Playwright on: 2025-10-25*
+
+#### Responsive Tablet.Jpg
+
+![Responsive Tablet.Jpg](./screenshots/responsive-tablet.jpg)
+
+*Captured with Playwright on: 2025-10-25*
 
 <!-- PLAYWRIGHT_SCREENSHOTS_END -->
 
