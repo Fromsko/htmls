@@ -38,8 +38,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # 获取完整历史记录
-          clean: true     # 确保工作目录干净
+          fetch-depth: 0 # 获取完整历史记录
+          clean: true # 确保工作目录干净
 
       # 验证检出的代码
       - name: Verify checkout
