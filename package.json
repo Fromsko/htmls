@@ -1,0 +1,26 @@
+{
+  "name": "htmls",
+  "version": "1.0.0",
+  "description": "AI Navigation Center - A modern navigation interface for AI tools, UI frameworks, and AI editors",
+  "main": "index.html",
+  "scripts": {
+    "test": "playwright test",
+    "test:debug": "playwright test --debug",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "screenshot": "node scripts/screenshot.js"
+  },
+  "keywords": [
+    "ai",
+    "navigation",
+    "tools",
+    "ui-frameworks",
+    "editors"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "playwright": "^1.40.0"
+  }
+}

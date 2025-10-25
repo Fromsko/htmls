@@ -1,0 +1,128 @@
+name: Playwright Screenshot Update
+
+# 触发条件
+on:
+  # 手动触发
+  workflow_dispatch:
+  # 定时任务 - 每周一早上8点(UTC)
+  schedule:
+    - cron: "0 8 * * 1"
+  # Push 到 main 分支时
+  push:
+    branches:
+      - main
+    paths:
+      - "index.html"
+      - "chat.html"
+      - "service-worker.js"
+      - "tests/**"
+      - "package.json"
+
+# 并发控制 - 确保同时只运行一个工作流
+concurrency:
+  group: screenshot-update
+  cancel-in-progress: true
+
+jobs:
+  screenshot:
+    name: Capture Screenshots with Playwright
+    runs-on: ubuntu-latest
+
+    # 权限配置
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      # 步骤 1: 检出代码
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # 步骤 2: 设置 Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      # 步骤 3: 安装依赖
+      - name: Install dependencies
+        run: npm ci
+        env:
+          CI: true
+
+      # 步骤 4: 安装 Playwright 浏览器
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+        env:
+          CI: true
+
+      # 步骤 5: 运行 Playwright 测试（截图）
+      - name: Run Playwright screenshot tests
+        run: npm test
+        env:
+          CI: true
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "0"
+
+      # 步骤 6: 更新 README.md
+      - name: Update README with screenshots
+        run: node scripts/update-readme.js
+        env:
+          CI: true
+
+      # 步骤 7: 检查是否有变更
+      - name: Check for changes
+        id: git-check
+        run: |
+          git diff --quiet || echo "changes=true" >> $GITHUB_OUTPUT
+          git status
+
+      # 步骤 8: 配置 Git
+      - name: Configure Git
+        if: steps.git-check.outputs.changes == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      # 步骤 9: 提交和推送更改
+      - name: Commit and push changes
+        if: steps.git-check.outputs.changes == 'true'
+        run: |
+          git add -A
+          git commit -m "chore: update screenshots via Playwright [skip ci]"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 步骤 10: 上传测试报告
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+      # 步骤 11: 上传截图
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: screenshots/
+          retention-days: 30
+
+      # 步骤 12: 测试总结
+      - name: Print summary
+        if: always()
+        run: |
+          echo "### 📸 Playwright Screenshot Update" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Screenshot capture completed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Artifacts:**" >> $GITHUB_STEP_SUMMARY
+          echo "- 📊 [Test Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+          echo "- 🖼️ Screenshots saved to \`screenshots/\` directory" >> $GITHUB_STEP_SUMMARY
