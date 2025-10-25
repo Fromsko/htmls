@@ -41,16 +41,16 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      # 步骤 2: 设置 Node.js
+      # 步骤 2: 设置 Node.js (不使用缓存)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "18"
-          cache: "npm"
 
-      # 步骤 3: 安装依赖
+      # 步骤 3: 清理旧依赖并安装新依赖
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci --force || npm install --force
         env:
           CI: true
 
@@ -59,6 +59,7 @@ jobs:
         run: npx playwright install --with-deps chromium
         env:
           CI: true
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "0"
 
       # 步骤 5: 运行 Playwright 测试（截图）
       - name: Run Playwright screenshot tests
