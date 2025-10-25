@@ -7,18 +7,21 @@
 ## ✨ 功能特性
 
 ### 🎯 核心功能
+
 - **🔗 导航中心**: 集合主流 AI 工具、UI 框架和 AI 编辑器的快速访问
 - **💬 聊天助手**: 交互式 AI 对话界面
 - **📱 响应式设计**: 完美支持桌面、平板和手机设备
 - **🌙 暗色主题**: 现代化的深色主题设计，护眼舒适
 
 ### 🎨 设计特色
+
 - 采用 Tailwind CSS 构建，高效的原子化 CSS 框架
 - Google 风格的简洁 UI 设计
 - Animate.css 和 AOS.js 的流畅动画效果
 - 自定义字体图标和favicon动态加载
 
 ### ⚡ 性能优化
+
 - Service Worker 离线缓存支持
 - 智能资源预加载和缓存策略
 - 最小化 JavaScript 包体积
@@ -47,17 +50,20 @@ htmls/
 ### 本地开发
 
 1. **克隆项目**
+
 ```bash
 git clone <repository-url>
 cd htmls
 ```
 
 2. **安装依赖**
+
 ```bash
 npm install
 ```
 
 3. **本地预览**
+
 ```bash
 # 直接用浏览器打开 index.html 文件
 # 或使用本地服务器
@@ -97,7 +103,7 @@ The main navigation center showcasing AI tools, UI frameworks, and AI editors.
 
 ![Index Full.Jpg](./screenshots/index-full.jpg)
 
-*Captured with Playwright on: 2025-10-25*
+_Captured with Playwright on: 2025-10-25_
 
 ### 💬 Chat Page (Conversation Interface)
 
@@ -107,7 +113,7 @@ The AI chat assistant interface for interactive conversations.
 
 ![Chat Full.Jpg](./screenshots/chat-full.jpg)
 
-*Captured with Playwright on: 2025-10-25*
+_Captured with Playwright on: 2025-10-25_
 
 ### 📱 Responsive Design
 
@@ -117,25 +123,26 @@ Screenshots showing the responsive design across different device sizes.
 
 ![Responsive Desktop.Jpg](./screenshots/responsive-desktop.jpg)
 
-*Captured with Playwright on: 2025-10-25*
+_Captured with Playwright on: 2025-10-25_
 
 #### Responsive Mobile.Jpg
 
 ![Responsive Mobile.Jpg](./screenshots/responsive-mobile.jpg)
 
-*Captured with Playwright on: 2025-10-25*
+_Captured with Playwright on: 2025-10-25_
 
 #### Responsive Tablet.Jpg
 
 ![Responsive Tablet.Jpg](./screenshots/responsive-tablet.jpg)
 
-*Captured with Playwright on: 2025-10-25*
+_Captured with Playwright on: 2025-10-25_
 
 <!-- PLAYWRIGHT_SCREENSHOTS_END -->
 
 ## 🛠 技术栈
 
 ### 前端框架
+
 - **React 18**: 用户界面构建
 - **Tailwind CSS**: 样式和响应式设计
 - **Font Awesome 6**: 图标库
@@ -143,11 +150,13 @@ Screenshots showing the responsive design across different device sizes.
 - **AOS.js**: 滚动动画库
 
 ### 开发工具
+
 - **Playwright**: 自动化测试和截图
 - **Node.js 18+**: 运行环境
 - **GitHub Actions**: CI/CD 自动化
 
 ### 浏览器支持
+
 - Chrome/Chromium (最新版)
 - Firefox (最新版)
 - Safari (最新版)
@@ -171,6 +180,7 @@ Screenshots showing the responsive design across different device sizes.
 ### 💬 聊天助手页面 (chat.html)
 
 提供实时的 AI 对话交互体验：
+
 - 流式文本输出
 - 消息历史记录
 - 右键菜单快捷选项
@@ -181,11 +191,13 @@ Screenshots showing the responsive design across different device sizes.
 本项目使用 GitHub Actions 自动运行 Playwright 测试并更新 README：
 
 **触发条件：**
+
 - ✅ 每周一早上 8 点 (UTC) 自动运行
 - ✅ 手动触发 (Manual dispatch)
 - ✅ Push 到 main 分支时
 
 **自动化流程：**
+
 1. 检出最新代码
 2. 安装依赖和 Playwright 浏览器
 3. 运行截图测试
@@ -195,6 +207,7 @@ Screenshots showing the responsive design across different device sizes.
 ## 🎯 特性展示
 
 ### 动画和交互
+
 - 页面加载动画
 - 卡片悬停效果
 - 消息滑入动画
@@ -202,6 +215,7 @@ Screenshots showing the responsive design across different device sizes.
 - 按钮按压反馈
 
 ### 缓存策略
+
 - **核心资源**: 预缓存，首次加载优先
 - **CDN 资源**: 网络优先，失败回退缓存
 - **运行时资源**: 网络优先策略
@@ -209,12 +223,14 @@ Screenshots showing the responsive design across different device sizes.
 ## 📝 配置说明
 
 ### Playwright 配置 (playwright.config.js)
+
 - **浏览器**: Chromium
 - **截图质量**: 95%
 - **视口尺寸**: 1280x720 (默认)
 - **报告**: HTML 报告
 
 ### 截图测试覆盖
+
 - ✅ 主页完整页面截图
 - ✅ 主页可见区域截图
 - ✅ 聊天页面交互截图
@@ -261,6 +277,7 @@ Screenshots showing the responsive design across different device sizes.
 ## 🙏 致谢
 
 感谢以下开源项目的支持：
+
 - [React](https://react.dev)
 - [Tailwind CSS](https://tailwindcss.com)
 - [Playwright](https://playwright.dev)
@@ -269,10 +286,11 @@ Screenshots showing the responsive design across different device sizes.
 ## 📞 联系方式
 
 如有任何问题或建议，欢迎通过以下方式联系：
+
 - 📧 Email: [hnkong666@gmail.com]
 
 ---
 
-**最后更新**: 2025-10-25  
+**最后更新**: 2025-10-25
 **版本**: 1.0.0  
 **状态**: ✅ 活跃维护中
