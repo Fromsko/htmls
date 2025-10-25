@@ -86,10 +86,20 @@ jobs:
       - name: Verify Playwright version
         run: |
           echo "🔍 验证 Playwright 版本..."
-          bun ls @playwright/test
+          if [ -d "node_modules/@playwright/test" ]; then
+            echo "✅ @playwright/test 已安装"
+            cat node_modules/@playwright/test/package.json | grep '"version"' | head -1
+          else
+            echo "❌ @playwright/test 未找到"
+          fi
           echo ""
-          echo "检查 node_modules 中的版本:"
-          find node_modules -maxdepth 1 -name "*playwright*" -type d | head -5
+          echo "检查 node_modules 中的 playwright:"
+          if [ -d "node_modules/playwright" ]; then
+            echo "✅ playwright 已安装（作为 @playwright/test 的依赖）"
+            cat node_modules/playwright/package.json | grep '"version"' | head -1
+          else
+            echo "❌ playwright 未找到"
+          fi
 
       # 步骤 7: Playwright 浏览器缓存
       - name: Cache Playwright browsers
