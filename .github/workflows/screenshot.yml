@@ -116,9 +116,9 @@ jobs:
       - name: Install Playwright browsers
         run: bunx playwright install --with-deps chromium
 
-      # 步骤 9: 运行测试
+      # 步骤 9: 运行测试（使用 Playwright CLI 而不是 bun test）
       - name: Run Playwright tests
-        run: bun test
+        run: bunx playwright test
         timeout-minutes: 15
 
       # 步骤 10: 更新 README
