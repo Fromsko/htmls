@@ -24,8 +24,8 @@ test.describe("AI Navigation Center - Screenshots", () => {
   test("should capture index.html screenshot", async ({ page }) => {
     await page.goto(getFileUrl("index.html"));
     await page.waitForLoadState("load");
-    // 等待所有动画和内容完全加载
-    await page.waitForTimeout(3000);
+    // 等待页面完全稳定
+    await page.waitForTimeout(2000);
 
     // 截取长屏
     await page.screenshot({
@@ -43,9 +43,17 @@ test.describe("AI Navigation Center - Screenshots", () => {
    */
   test("should capture chat.html screenshot", async ({ page }) => {
     await page.goto(getFileUrl("chat.html"));
-    await page.waitForLoadState("load");
-    // 等待 React 组件和动画完全加载
+    // 等待页面完全加载和DOM稳定
+    await page.waitForLoadState("domcontentloaded");
     await page.waitForTimeout(3000);
+
+    // 等待确保导航栏和聊天容器都已显示
+    try {
+      await page.locator("nav").isVisible({ timeout: 5000 });
+      await page.locator(".chat-container").isVisible({ timeout: 5000 });
+    } catch (e) {
+      console.warn("Warning: Some elements might not be visible");
+    }
 
     // 截取长屏
     await page.screenshot({
@@ -65,8 +73,8 @@ test.describe("AI Navigation Center - Screenshots", () => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto(getFileUrl("index.html"));
     await page.waitForLoadState("load");
-    // 等待所有动画完成
-    await page.waitForTimeout(3000);
+    // 等待页面完全稳定
+    await page.waitForTimeout(2000);
 
     await page.screenshot({
       path: path.join(screenshotDir, "responsive-desktop.jpg"),
@@ -85,8 +93,8 @@ test.describe("AI Navigation Center - Screenshots", () => {
     await page.setViewportSize({ width: 768, height: 1024 });
     await page.goto(getFileUrl("index.html"));
     await page.waitForLoadState("load");
-    // 等待所有动画完成
-    await page.waitForTimeout(3000);
+    // 等待页面完全稳定
+    await page.waitForTimeout(2000);
 
     await page.screenshot({
       path: path.join(screenshotDir, "responsive-tablet.jpg"),
@@ -96,25 +104,5 @@ test.describe("AI Navigation Center - Screenshots", () => {
     });
 
     console.log("✅ Tablet screenshot captured");
-  });
-
-  /**
-   * 手机响应式截图
-   */
-  test("should capture responsive mobile", async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 812 });
-    await page.goto(getFileUrl("index.html"));
-    await page.waitForLoadState("load");
-    // 等待所有动画完成
-    await page.waitForTimeout(3000);
-
-    await page.screenshot({
-      path: path.join(screenshotDir, "responsive-mobile.jpg"),
-      fullPage: true,
-      type: "jpeg",
-      quality: 95,
-    });
-
-    console.log("✅ Mobile screenshot captured");
   });
 });

@@ -9,14 +9,6 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css"
-    />
     <style>
       /* ===== 全局样式 ===== */
       * {
@@ -203,7 +195,7 @@
   </head>
   <body>
     <!-- 顶部导航栏 -->
-    <nav class="sticky top-0 z-50 animate__animated animate__slideInDown">
+    <nav class="sticky top-0 z-50">
       <div
         class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center"
       >
@@ -223,12 +215,12 @@
       <!-- 主流 AI 工具 -->
       <section id="ai" class="mb-20">
         <h2
-          class="text-4xl font-bold mb-4 animate__animated animate__fadeInLeft"
+          class="text-4xl font-bold mb-4"
         >
           主流 AI 工具
         </h2>
         <p
-          class="text-gray-400 mb-12 animate__animated animate__fadeInLeft"
+          class="text-gray-400 mb-12"
           style="animation-delay: 0.1s"
         >
           探索最前沿的人工智能工具和平台
@@ -242,12 +234,12 @@
       <!-- 主流 UI 框架 -->
       <section id="ui" class="mb-20">
         <h2
-          class="text-4xl font-bold mb-4 animate__animated animate__fadeInLeft"
+          class="text-4xl font-bold mb-4"
         >
           主流 UI 框架
         </h2>
         <p
-          class="text-gray-400 mb-12 animate__animated animate__fadeInLeft"
+          class="text-gray-400 mb-12"
           style="animation-delay: 0.1s"
         >
           现代化的前端 UI 框架和组件库
@@ -261,12 +253,12 @@
       <!-- 主流 AI 编辑器 -->
       <section id="editor">
         <h2
-          class="text-4xl font-bold mb-4 animate__animated animate__fadeInLeft"
+          class="text-4xl font-bold mb-4"
         >
           主流 AI 编辑器
         </h2>
         <p
-          class="text-gray-400 mb-12 animate__animated animate__fadeInLeft"
+          class="text-gray-400 mb-12"
           style="animation-delay: 0.1s"
         >
           智能化的代码编辑工具和开发环境
@@ -279,7 +271,7 @@
     </div>
 
     <!-- 页脚 -->
-    <footer class="mt-20 pt-12 pb-12 animate__animated animate__fadeInUp">
+    <footer class="mt-20 pt-12 pb-12">
       <div class="max-w-6xl mx-auto px-6 text-center">
         <p class="text-sm mb-2">AI 导航中心 © 2025</p>
         <p class="text-xs text-gray-500">
@@ -294,8 +286,6 @@
     </a>
 
     <!-- 库和脚本 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-
     <script>
       // ===== 数据模块 =====
       const navData = {
@@ -438,7 +428,7 @@
         }
 
         return `
-          <a href="${item.url}" target="_blank" class="group" data-aos="fade-up" data-aos-duration="600" data-aos-delay="${delay}">
+          <a href="${item.url}" target="_blank" class="group">
             <div class="nav-card rounded-lg p-6${featured}">
               <div class="icon-box mb-4">${iconHtml}</div>
               <h3 class="text-lg font-bold mb-2">${item.name}</h3>
@@ -500,16 +490,6 @@
         });
       };
 
-      // ===== AOS 初始化模块 =====
-      const initAOS = () => {
-        AOS.init({
-          duration: 800,
-          easing: "ease-in-out",
-          once: true,
-          offset: 100,
-        });
-      };
-
       // ===== Service Worker 注册模块 =====
       const registerServiceWorker = () => {
         if ("serviceWorker" in navigator) {
@@ -530,7 +510,6 @@
       document.addEventListener("DOMContentLoaded", () => {
         initializeDOM();
         loadFavicons();
-        initAOS();
         registerServiceWorker();
       });
     </script>
