@@ -39,7 +39,6 @@
         position: relative;
         color: #cbd5e1;
         font-weight: 500;
-        transition: color 0.3s ease;
       }
 
       nav a:hover {
@@ -54,7 +53,6 @@
         bottom: -6px;
         left: 0;
         background: linear-gradient(90deg, #60a5fa, #34a853);
-        transition: width 0.3s ease;
       }
 
       nav a:hover::after {
@@ -63,7 +61,6 @@
 
       /* ===== 卡片样式 ===== */
       .nav-card {
-        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         background: rgba(30, 41, 59, 0.8);
         border: 1px solid rgba(148, 163, 184, 0.15);
         position: relative;
@@ -168,28 +165,12 @@
         transform: scale(0.95);
       }
 
-      /* ===== 渐变文字 ===== */
+      /* ===== 梯度文本 ===== */
       .gradient-text {
         background: linear-gradient(90deg, #60a5fa, #34a853);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-      }
-
-      /* ===== 动画 ===== */
-      .glow {
-        color: #60a5fa;
-        animation: pulse-glow 2s infinite;
-      }
-
-      @keyframes pulse-glow {
-        0%,
-        100% {
-          opacity: 1;
-        }
-        50% {
-          opacity: 0.6;
-        }
       }
     </style>
   </head>
@@ -221,7 +202,6 @@
         </h2>
         <p
           class="text-gray-400 mb-12"
-          style="animation-delay: 0.1s"
         >
           探索最前沿的人工智能工具和平台
         </p>
@@ -240,7 +220,6 @@
         </h2>
         <p
           class="text-gray-400 mb-12"
-          style="animation-delay: 0.1s"
         >
           现代化的前端 UI 框架和组件库
         </p>
@@ -259,7 +238,6 @@
         </h2>
         <p
           class="text-gray-400 mb-12"
-          style="animation-delay: 0.1s"
         >
           智能化的代码编辑工具和开发环境
         </p>
@@ -412,7 +390,6 @@
       // ===== 卡片渲染模块 =====
       const renderCard = (item, index, hasIcon = true) => {
         const featured = item.featured ? " featured-card" : "";
-        const delay = index * 100;
 
         let iconHtml = "";
         if (hasIcon && item.icon) {
