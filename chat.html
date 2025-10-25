@@ -1,622 +1,620 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>简易聊天页面</title>
-		<!-- 引入 React 和 ReactDOM -->
-		<script
-			crossorigin
-			src="https://unpkg.com/react@18/umd/react.development.js"
-		></script>
-		<script
-			crossorigin
-			src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
-		></script>
-		<!-- 引入 Babel 用于解析 JSX -->
-		<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-		<style>
-			* {
-				margin: 0;
-				padding: 0;
-				box-sizing: border-box;
-			}
-			:root {
-				--tool-color: #8a2be2;
-				--tool-bg-color: #f0e6ff;
-			}
-			body {
-				font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
-				background-color: #f5f5f5;
-				color: #333;
-			}
-			.chat-container {
-				max-width: 800px;
-				margin: 20px auto;
-				background-color: #fff;
-				border-radius: 10px;
-				box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-				overflow: hidden;
-			}
-			.chat-header {
-				background-color: #0084ff;
-				color: white;
-				padding: 15px 20px;
-				font-size: 18px;
-				font-weight: bold;
-			}
-			.chat-messages {
-				height: 400px;
-				padding: 15px;
-				overflow-y: auto;
-			}
-			.message {
-				margin-bottom: 15px;
-				display: flex;
-			}
-			.message.user {
-				justify-content: flex-end;
-			}
-			.message-content {
-				padding: 10px 15px;
-				border-radius: 18px;
-				max-width: 70%;
-				min-width: 50px;
-				word-break: break-word;
-				width: fit-content;
-			}
-			.message.user .message-content {
-				background-color: #0084ff;
-				color: white;
-				border-top-right-radius: 4px;
-			}
-			.message.bot .message-content {
-				background-color: #f1f1f1;
-				border-top-left-radius: 4px;
-			}
-			.message.tool .message-content {
-				background-color: var(--tool-bg-color);
-				color: var(--tool-color);
-				border-top-left-radius: 4px;
-				font-family: monospace;
-			}
-			.tool-header {
-				cursor: pointer;
-				display: flex;
-				align-items: center;
-				font-weight: bold;
-				margin-bottom: 5px;
-			}
-			.tool-header .tool-icon {
-				margin-right: 5px;
-				transition: transform 0.3s ease;
-			}
-			.tool-header .tool-icon.expanded {
-				transform: rotate(90deg);
-			}
-			.tool-details {
-				max-height: 0;
-				overflow: hidden;
-				transition: max-height 0.3s ease;
-			}
-			.tool-details.expanded {
-				max-height: 500px;
-			}
-			.tool-progress {
-				margin: 10px 0;
-				height: 4px;
-				background-color: #eee;
-				border-radius: 2px;
-				overflow: hidden;
-			}
-			.tool-progress-bar {
-				height: 100%;
-				background-color: var(--tool-color);
-				width: 0%;
-				transition: width 0.3s ease;
-				animation: progress 2s ease-in-out;
-			}
-			@keyframes progress {
-				0% {
-					width: 0%;
-				}
-				100% {
-					width: 100%;
-				}
-			}
-			.message-time {
-				font-size: 12px;
-				color: #999;
-				margin-top: 5px;
-				text-align: right;
-			}
-			.chat-input {
-				display: flex;
-				padding: 15px;
-				border-top: 1px solid #eee;
-			}
-			.chat-input input {
-				flex: 1;
-				padding: 10px 15px;
-				border: 1px solid #ddd;
-				border-radius: 20px;
-				outline: none;
-				font-size: 16px;
-			}
-			.chat-input button {
-				margin-left: 10px;
-				padding: 10px 20px;
-				background-color: #0084ff;
-				color: white;
-				border: none;
-				border-radius: 20px;
-				cursor: pointer;
-				font-size: 16px;
-			}
-			.chat-input button:hover {
-				background-color: #0073e6;
-			}
-			.typing-indicator {
-				display: flex;
-				padding: 10px 15px;
-			}
-			.typing-indicator span {
-				height: 8px;
-				width: 8px;
-				background-color: #999;
-				border-radius: 50%;
-				display: inline-block;
-				margin-right: 5px;
-				animation: typing 1s infinite ease-in-out;
-			}
-			.typing-indicator span:nth-child(2) {
-				animation-delay: 0.2s;
-			}
-			.typing-indicator span:nth-child(3) {
-				animation-delay: 0.4s;
-			}
-			@keyframes typing {
-				0% {
-					transform: translateY(0);
-				}
-				50% {
-					transform: translateY(-5px);
-				}
-				100% {
-					transform: translateY(0);
-				}
-			}
-			.context-menu {
-				position: absolute;
-				background-color: white;
-				border: 1px solid #ddd;
-				border-radius: 4px;
-				box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-				padding: 8px 0;
-				z-index: 1000;
-			}
-			.context-menu-item {
-				padding: 8px 16px;
-				cursor: pointer;
-				display: flex;
-				align-items: center;
-			}
-			.context-menu-item:hover {
-				background-color: #f5f5f5;
-			}
-			.context-menu-item .checkbox {
-				width: 16px;
-				height: 16px;
-				border: 1px solid #ccc;
-				border-radius: 3px;
-				margin-right: 8px;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-			}
-			.context-menu-item .checkbox.checked {
-				background-color: #0084ff;
-				border-color: #0084ff;
-			}
-			.context-menu-item .checkbox.checked:after {
-				content: "✓";
-				color: white;
-				font-size: 12px;
-			}
-			.streaming-char {
-				animation: fadeIn 0.1s ease-in-out;
-			}
-			@keyframes fadeIn {
-				from {
-					opacity: 0;
-				}
-				to {
-					opacity: 1;
-				}
-			}
-		</style>
-	</head>
-	<body>
-		<div id="root"></div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>简易聊天页面</title>
+    <!-- 引入 React 和 ReactDOM -->
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.development.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+    ></script>
+    <!-- 引入 Babel 用于解析 JSX -->
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      :root {
+        --tool-color: #8a2be2;
+        --tool-bg-color: #f0e6ff;
+      }
+      body {
+        font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        background-color: #f5f5f5;
+        color: #333;
+      }
+      .chat-container {
+        max-width: 800px;
+        margin: 20px auto;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      .chat-header {
+        background-color: #0084ff;
+        color: white;
+        padding: 15px 20px;
+        font-size: 18px;
+        font-weight: bold;
+      }
+      .chat-messages {
+        height: 400px;
+        padding: 15px;
+        overflow-y: auto;
+      }
+      .message {
+        margin-bottom: 15px;
+        display: flex;
+      }
+      .message.user {
+        justify-content: flex-end;
+      }
+      .message-content {
+        padding: 10px 15px;
+        border-radius: 18px;
+        max-width: 70%;
+        min-width: 50px;
+        word-break: break-word;
+        width: fit-content;
+      }
+      .message.user .message-content {
+        background-color: #0084ff;
+        color: white;
+        border-top-right-radius: 4px;
+      }
+      .message.bot .message-content {
+        background-color: #f1f1f1;
+        border-top-left-radius: 4px;
+      }
+      .message.tool .message-content {
+        background-color: var(--tool-bg-color);
+        color: var(--tool-color);
+        border-top-left-radius: 4px;
+        font-family: monospace;
+      }
+      .tool-header {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+      .tool-header .tool-icon {
+        margin-right: 5px;
+        transition: transform 0.3s ease;
+      }
+      .tool-header .tool-icon.expanded {
+        transform: rotate(90deg);
+      }
+      .tool-details {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+      }
+      .tool-details.expanded {
+        max-height: 500px;
+      }
+      .tool-progress {
+        margin: 10px 0;
+        height: 4px;
+        background-color: #eee;
+        border-radius: 2px;
+        overflow: hidden;
+      }
+      .tool-progress-bar {
+        height: 100%;
+        background-color: var(--tool-color);
+        width: 0%;
+        transition: width 0.3s ease;
+        animation: progress 2s ease-in-out;
+      }
+      @keyframes progress {
+        0% {
+          width: 0%;
+        }
+        100% {
+          width: 100%;
+        }
+      }
+      .message-time {
+        font-size: 12px;
+        color: #999;
+        margin-top: 5px;
+        text-align: right;
+      }
+      .chat-input {
+        display: flex;
+        padding: 15px;
+        border-top: 1px solid #eee;
+      }
+      .chat-input input {
+        flex: 1;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        outline: none;
+        font-size: 16px;
+      }
+      .chat-input button {
+        margin-left: 10px;
+        padding: 10px 20px;
+        background-color: #0084ff;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      .chat-input button:hover {
+        background-color: #0073e6;
+      }
+      .typing-indicator {
+        display: flex;
+        padding: 10px 15px;
+      }
+      .typing-indicator span {
+        height: 8px;
+        width: 8px;
+        background-color: #999;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 5px;
+        animation: typing 1s infinite ease-in-out;
+      }
+      .typing-indicator span:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .typing-indicator span:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+      @keyframes typing {
+        0% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-5px);
+        }
+        100% {
+          transform: translateY(0);
+        }
+      }
+      .context-menu {
+        position: absolute;
+        background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 8px 0;
+        z-index: 1000;
+      }
+      .context-menu-item {
+        padding: 8px 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+      }
+      .context-menu-item:hover {
+        background-color: #f5f5f5;
+      }
+      .context-menu-item .checkbox {
+        width: 16px;
+        height: 16px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        margin-right: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .context-menu-item .checkbox.checked {
+        background-color: #0084ff;
+        border-color: #0084ff;
+      }
+      .context-menu-item .checkbox.checked:after {
+        content: "✓";
+        color: white;
+        font-size: 12px;
+      }
+      .streaming-char {
+        animation: fadeIn 0.1s ease-in-out;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
 
-		<script type="text/babel">
-			// 创建聊天组件
-			function ChatApp() {
-				const [messages, setMessages] = React.useState([
-					{
-						id: 1,
-						text: "你好！有什么我可以帮助你的吗？",
-						sender: "bot",
-						time: "11:00",
-					},
-				]);
-				const [inputText, setInputText] = React.useState("");
-				const [isTyping, setIsTyping] = React.useState(false);
-				const [toolProgress, setToolProgress] = React.useState(0);
-				const [isToolRunning, setIsToolRunning] = React.useState(false);
-				const [expandedTools, setExpandedTools] = React.useState({});
-				const [streamingEnabled, setStreamingEnabled] = React.useState(true);
-				const [showContextMenu, setShowContextMenu] = React.useState(false);
-				const [contextMenuPosition, setContextMenuPosition] = React.useState({
-					x: 0,
-					y: 0,
-				});
-				const [currentStreamingMessage, setCurrentStreamingMessage] =
-					React.useState(null);
+    <script type="text/babel">
+      // 创建聊天组件
+      function ChatApp() {
+        const [messages, setMessages] = React.useState([
+          {
+            id: 1,
+            text: "你好！有什么我可以帮助你的吗？",
+            sender: "bot",
+            time: "11:00",
+          },
+        ]);
+        const [inputText, setInputText] = React.useState("");
+        const [isTyping, setIsTyping] = React.useState(false);
+        const [toolProgress, setToolProgress] = React.useState(0);
+        const [isToolRunning, setIsToolRunning] = React.useState(false);
+        const [expandedTools, setExpandedTools] = React.useState({});
+        const [streamingEnabled, setStreamingEnabled] = React.useState(true);
+        const [showContextMenu, setShowContextMenu] = React.useState(false);
+        const [contextMenuPosition, setContextMenuPosition] = React.useState({
+          x: 0,
+          y: 0,
+        });
+        const [currentStreamingMessage, setCurrentStreamingMessage] =
+          React.useState(null);
 
-				// 处理右键菜单
-				const handleContextMenu = (e) => {
-					e.preventDefault();
-					// 检查是否在聊天区域内
-					const chatMessages = document.querySelector(".chat-messages");
-					if (chatMessages && chatMessages.contains(e.target)) {
-						setContextMenuPosition({ x: e.clientX, y: e.clientY });
-						setShowContextMenu(true);
-					}
-				};
+        // 处理右键菜单
+        const handleContextMenu = (e) => {
+          e.preventDefault();
+          // 检查是否在聊天区域内
+          const chatMessages = document.querySelector(".chat-messages");
+          if (chatMessages && chatMessages.contains(e.target)) {
+            setContextMenuPosition({ x: e.clientX, y: e.clientY });
+            setShowContextMenu(true);
+          }
+        };
 
-				// 切换流式输出
-				const toggleStreaming = () => {
-					setStreamingEnabled(!streamingEnabled);
-					setShowContextMenu(false);
-				};
+        // 切换流式输出
+        const toggleStreaming = () => {
+          setStreamingEnabled(!streamingEnabled);
+          setShowContextMenu(false);
+        };
 
-				// 关闭右键菜单
-				const closeContextMenu = () => {
-					setShowContextMenu(false);
-				};
+        // 关闭右键菜单
+        const closeContextMenu = () => {
+          setShowContextMenu(false);
+        };
 
-				// 切换工具详情的展开/折叠状态
-				const toggleToolDetails = (id) => {
-					setExpandedTools((prev) => ({
-						...prev,
-						[id]: !prev[id],
-					}));
-				};
+        // 切换工具详情的展开/折叠状态
+        const toggleToolDetails = (id) => {
+          setExpandedTools((prev) => ({
+            ...prev,
+            [id]: !prev[id],
+          }));
+        };
 
-				// 添加事件监听器
-				React.useEffect(() => {
-					document.addEventListener("click", closeContextMenu);
-					document.addEventListener("contextmenu", handleContextMenu);
+        // 添加事件监听器
+        React.useEffect(() => {
+          document.addEventListener("click", closeContextMenu);
+          document.addEventListener("contextmenu", handleContextMenu);
 
-					return () => {
-						document.removeEventListener("click", closeContextMenu);
-						document.removeEventListener("contextmenu", handleContextMenu);
-					};
-				}, []);
-				const messagesEndRef = React.useRef(null);
+          return () => {
+            document.removeEventListener("click", closeContextMenu);
+            document.removeEventListener("contextmenu", handleContextMenu);
+          };
+        }, []);
+        const messagesEndRef = React.useRef(null);
 
-				// 自动滚动到最新消息
-				React.useEffect(() => {
-					scrollToBottom();
-				}, [messages]);
+        // 自动滚动到最新消息
+        React.useEffect(() => {
+          scrollToBottom();
+        }, [messages]);
 
-				const scrollToBottom = () => {
-					if (messagesEndRef.current) {
-						messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-					}
-				};
+        const scrollToBottom = () => {
+          if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+          }
+        };
 
-				const handleInputChange = (e) => {
-					setInputText(e.target.value);
-				};
+        const handleInputChange = (e) => {
+          setInputText(e.target.value);
+        };
 
-				const formatTime = () => {
-					const now = new Date();
-					return `${now.getHours()}:${String(now.getMinutes()).padStart(
-						2,
-						"0"
-					)}`;
-				};
+        const formatTime = () => {
+          const now = new Date();
+          return `${now.getHours()}:${String(now.getMinutes()).padStart(
+            2,
+            "0"
+          )}`;
+        };
 
-				// 流式输出文本
-				const streamText = async (text) => {
-					const messageId = Date.now();
-					const streamingMessage = {
-						id: messageId,
-						text: "",
-						sender: "bot",
-						time: formatTime(),
-						isStreaming: true,
-					};
+        // 流式输出文本
+        const streamText = async (text) => {
+          const messageId = Date.now();
+          const streamingMessage = {
+            id: messageId,
+            text: "",
+            sender: "bot",
+            time: formatTime(),
+            isStreaming: true,
+          };
 
-					setMessages((prev) => [...prev, streamingMessage]);
-					setCurrentStreamingMessage(messageId);
+          setMessages((prev) => [...prev, streamingMessage]);
+          setCurrentStreamingMessage(messageId);
 
-					// 逐字输出
-					for (let i = 0; i < text.length; i++) {
-						await new Promise((resolve) => setTimeout(resolve, 30));
-						setMessages((prev) =>
-							prev.map((msg) =>
-								msg.id === messageId
-									? { ...msg, text: text.substring(0, i + 1) }
-									: msg
-							)
-						);
-					}
+          // 逐字输出
+          for (let i = 0; i < text.length; i++) {
+            await new Promise((resolve) => setTimeout(resolve, 30));
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.id === messageId
+                  ? { ...msg, text: text.substring(0, i + 1) }
+                  : msg
+              )
+            );
+          }
 
-					// 完成流式输出
-					setMessages((prev) =>
-						prev.map((msg) =>
-							msg.id === messageId ? { ...msg, isStreaming: false } : msg
-						)
-					);
-					setCurrentStreamingMessage(null);
-				};
+          // 完成流式输出
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === messageId ? { ...msg, isStreaming: false } : msg
+            )
+          );
+          setCurrentStreamingMessage(null);
+        };
 
-				const handleSendMessage = async () => {
-					if (inputText.trim() === "") return;
+        const handleSendMessage = async () => {
+          if (inputText.trim() === "") return;
 
-					const newUserMessage = {
-						id: messages.length + 1,
-						text: inputText,
-						sender: "user",
-						time: formatTime(),
-					};
+          const newUserMessage = {
+            id: messages.length + 1,
+            text: inputText,
+            sender: "user",
+            time: formatTime(),
+          };
 
-					const userInput = inputText;
-					setMessages([...messages, newUserMessage]);
-					setInputText("");
-					setIsTyping(true);
+          const userInput = inputText;
+          setMessages([...messages, newUserMessage]);
+          setInputText("");
+          setIsTyping(true);
 
-					// 模拟机器人回复（现在支持异步工具调用）
-					setTimeout(async () => {
-						const botReplyText = await getBotReply(userInput);
-						setIsTyping(false);
+          // 模拟机器人回复（现在支持异步工具调用）
+          setTimeout(async () => {
+            const botReplyText = await getBotReply(userInput);
+            setIsTyping(false);
 
-						// 根据设置决定是否使用流式输出
-						if (streamingEnabled) {
-							await streamText(botReplyText);
-						} else {
-							const botReply = {
-								id: Date.now(),
-								text: botReplyText,
-								sender: "bot",
-								time: formatTime(),
-							};
-							setMessages((prevMessages) => [...prevMessages, botReply]);
-						}
-					}, 1000);
-				};
+            // 根据设置决定是否使用流式输出
+            if (streamingEnabled) {
+              await streamText(botReplyText);
+            } else {
+              const botReply = {
+                id: Date.now(),
+                text: botReplyText,
+                sender: "bot",
+                time: formatTime(),
+              };
+              setMessages((prevMessages) => [...prevMessages, botReply]);
+            }
+          }, 1000);
+        };
 
-				const handleKeyPress = (e) => {
-					if (e.key === "Enter") {
-						handleSendMessage();
-					}
-				};
+        const handleKeyPress = (e) => {
+          if (e.key === "Enter") {
+            handleSendMessage();
+          }
+        };
 
-				// 检查是否需要调用工具
-				const checkForToolCall = (text) => {
-					const lowerText = text.toLowerCase();
-					if (
-						lowerText.includes("工具") ||
-						lowerText.includes("mcp") ||
-						lowerText.includes("调用") ||
-						lowerText.includes("天气") ||
-						lowerText.includes("查询") ||
-						lowerText.includes("搜索")
-					) {
-						return true;
-					}
-					return false;
-				};
+        // 检查是否需要调用工具
+        const checkForToolCall = (text) => {
+          const lowerText = text.toLowerCase();
+          if (
+            lowerText.includes("工具") ||
+            lowerText.includes("mcp") ||
+            lowerText.includes("调用") ||
+            lowerText.includes("天气") ||
+            lowerText.includes("查询") ||
+            lowerText.includes("搜索")
+          ) {
+            return true;
+          }
+          return false;
+        };
 
-				// 模拟工具调用过程
-				const simulateToolCall = async (query) => {
-					setIsToolRunning(true);
+        // 模拟工具调用过程
+        const simulateToolCall = async (query) => {
+          setIsToolRunning(true);
 
-					// 添加工具调用消息
-					const toolName = query.includes("天气") ? "天气查询" : "通用搜索";
-					const toolCallMessage = {
-						id: Date.now(),
-						title: `调用工具: ${toolName}`,
-						details: `参数: "${query}"`,
-						sender: "tool",
-						type: "call",
-						time: formatTime(),
-					};
-					setMessages((prev) => [...prev, toolCallMessage]);
+          // 添加工具调用消息
+          const toolName = query.includes("天气") ? "天气查询" : "通用搜索";
+          const toolCallMessage = {
+            id: Date.now(),
+            title: `调用工具: ${toolName}`,
+            details: `参数: "${query}"`,
+            sender: "tool",
+            type: "call",
+            time: formatTime(),
+          };
+          setMessages((prev) => [...prev, toolCallMessage]);
 
-					// 模拟进度条
-					for (let i = 0; i <= 100; i += 10) {
-						setToolProgress(i);
-						await new Promise((r) => setTimeout(r, 200));
-					}
+          // 模拟进度条
+          for (let i = 0; i <= 100; i += 10) {
+            setToolProgress(i);
+            await new Promise((r) => setTimeout(r, 200));
+          }
 
-					// 模拟工具返回结果
-					let result = "";
-					if (query.includes("天气")) {
-						result = "北京市，晴，26°C，微风，湿度45%，空气质量良好。";
-					} else {
-						result =
-							"已找到相关信息，共12条结果。\n- 结果1: 相关度98%\n- 结果2: 相关度85%\n- 结果3: 相关度72%";
-					}
+          // 模拟工具返回结果
+          let result = "";
+          if (query.includes("天气")) {
+            result = "北京市，晴，26°C，微风，湿度45%，空气质量良好。";
+          } else {
+            result =
+              "已找到相关信息，共12条结果。\n- 结果1: 相关度98%\n- 结果2: 相关度85%\n- 结果3: 相关度72%";
+          }
 
-					// 添加工具结果消息
-					const toolResultMessage = {
-						id: Date.now() + 1,
-						title: `工具结果`,
-						details: result,
-						sender: "tool",
-						type: "result",
-						time: formatTime(),
-					};
-					setMessages((prev) => [...prev, toolResultMessage]);
-					setIsToolRunning(false);
-					setToolProgress(0);
+          // 添加工具结果消息
+          const toolResultMessage = {
+            id: Date.now() + 1,
+            title: `工具结果`,
+            details: result,
+            sender: "tool",
+            type: "result",
+            time: formatTime(),
+          };
+          setMessages((prev) => [...prev, toolResultMessage]);
+          setIsToolRunning(false);
+          setToolProgress(0);
 
-					return result;
-				};
+          return result;
+        };
 
-				// 简单的机器人回复逻辑
-				const getBotReply = async (text) => {
-					const lowerText = text.toLowerCase();
+        // 简单的机器人回复逻辑
+        const getBotReply = async (text) => {
+          const lowerText = text.toLowerCase();
 
-					// 检查是否需要调用工具
-					if (checkForToolCall(text)) {
-						const toolResult = await simulateToolCall(text);
-						return `根据工具查询结果：${toolResult.split("\n")[0]}`;
-					}
+          // 检查是否需要调用工具
+          if (checkForToolCall(text)) {
+            const toolResult = await simulateToolCall(text);
+            return `根据工具查询结果：${toolResult.split("\n")[0]}`;
+          }
 
-					if (
-						lowerText.includes("你好") ||
-						lowerText.includes("嗨") ||
-						lowerText.includes("hi")
-					) {
-						return "你好！很高兴和你聊天。";
-					} else if (lowerText.includes("名字")) {
-						return "我是聊天助手，很高兴为你服务！";
-					} else if (lowerText.includes("谢谢") || lowerText.includes("感谢")) {
-						return "不客气，随时为你服务！";
-					} else if (lowerText.includes("再见") || lowerText.includes("拜拜")) {
-						return "再见！有需要随时回来找我聊天哦。";
-					} else if (lowerText.includes("时间") || lowerText.includes("几点")) {
-						return `现在的时间是：${formatTime()}`;
-					} else {
-						const replies = [
-							"这个问题很有趣，让我想想...",
-							"我理解你的意思了，请继续告诉我更多。",
-							"这是个好问题！",
-							"我需要更多信息来回答这个问题。",
-							"我不太确定，能详细说明一下吗？",
-						];
-						return replies[Math.floor(Math.random() * replies.length)];
-					}
-				};
+          if (
+            lowerText.includes("你好") ||
+            lowerText.includes("嗨") ||
+            lowerText.includes("hi")
+          ) {
+            return "你好！很高兴和你聊天。";
+          } else if (lowerText.includes("名字")) {
+            return "我是聊天助手，很高兴为你服务！";
+          } else if (lowerText.includes("谢谢") || lowerText.includes("感谢")) {
+            return "不客气，随时为你服务！";
+          } else if (lowerText.includes("再见") || lowerText.includes("拜拜")) {
+            return "再见！有需要随时回来找我聊天哦。";
+          } else if (lowerText.includes("时间") || lowerText.includes("几点")) {
+            return `现在的时间是：${formatTime()}`;
+          } else {
+            const replies = [
+              "这个问题很有趣，让我想想...",
+              "我理解你的意思了，请继续告诉我更多。",
+              "这是个好问题！",
+              "我需要更多信息来回答这个问题。",
+              "我不太确定，能详细说明一下吗？",
+            ];
+            return replies[Math.floor(Math.random() * replies.length)];
+          }
+        };
 
-				// 渲染流式文本
-				const renderStreamingText = (text) => {
-					return text.split("").map((char, index) => (
-						<span key={index} className="streaming-char">
-							{char}
-						</span>
-					));
-				};
+        // 渲染流式文本
+        const renderStreamingText = (text) => {
+          return text.split("").map((char, index) => (
+            <span key={index} className="streaming-char">
+              {char}
+            </span>
+          ));
+        };
 
-				return (
-					<div className="chat-container">
-						<div className="chat-header">聊天助手</div>
-						<div className="chat-messages">
-							{showContextMenu && (
-								<div
-									className="context-menu"
-									style={{
-										top: contextMenuPosition.y,
-										left: contextMenuPosition.x,
-									}}
-								>
-									<div className="context-menu-item" onClick={toggleStreaming}>
-										<div
-											className={`checkbox ${
-												streamingEnabled ? "checked" : ""
-											}`}
-										></div>
-										流式输出
-									</div>
-								</div>
-							)}
-							{messages.map((message) => (
-								<div key={message.id} className={`message ${message.sender}`}>
-									<div className="message-content">
-										{message.sender === "tool" ? (
-											<React.Fragment>
-												<div
-													className="tool-header"
-													onClick={() => toggleToolDetails(message.id)}
-												>
-													<span
-														className={`tool-icon ${
-															expandedTools[message.id] ? "expanded" : ""
-														}`}
-													>
-														▶
-													</span>
-													{message.title}
-												</div>
-												<div
-													className={`tool-details ${
-														expandedTools[message.id] ? "expanded" : ""
-													}`}
-												>
-													{message.details}
-												</div>
-												<div className="message-time">{message.time}</div>
-											</React.Fragment>
-										) : (
-											<React.Fragment>
-												{message.isStreaming ? (
-													renderStreamingText(message.text)
-												) : (
-													message.text &&
-													message.text.split("\n").map((line, i) => (
-														<React.Fragment key={i}>
-															{line}
-															{i < message.text.split("\n").length - 1 && (
-																<br />
-															)}
-														</React.Fragment>
-													))
-												)}
-												<div className="message-time">{message.time}</div>
-											</React.Fragment>
-										)}
-									</div>
-								</div>
-							))}
-							{isTyping && (
-								<div className="typing-indicator">
-									<span></span>
-									<span></span>
-									<span></span>
-								</div>
-							)}
-							{isToolRunning && (
-								<div className="tool-progress">
-									<div
-										className="tool-progress-bar"
-										style={{ width: `${toolProgress}%` }}
-									></div>
-								</div>
-							)}
-							<div ref={messagesEndRef} />
-						</div>
-						<div className="chat-input">
-							<input
-								type="text"
-								value={inputText}
-								onChange={handleInputChange}
-								onKeyPress={handleKeyPress}
-								placeholder="输入消息..."
-							/>
-							<button onClick={handleSendMessage}>发送</button>
-						</div>
-					</div>
-				);
-			}
+        return (
+          <div className="chat-container">
+            <div className="chat-header">聊天助手</div>
+            <div className="chat-messages">
+              {showContextMenu && (
+                <div
+                  className="context-menu"
+                  style={{
+                    top: contextMenuPosition.y,
+                    left: contextMenuPosition.x,
+                  }}
+                >
+                  <div className="context-menu-item" onClick={toggleStreaming}>
+                    <div
+                      className={`checkbox ${
+                        streamingEnabled ? "checked" : ""
+                      }`}
+                    ></div>
+                    流式输出
+                  </div>
+                </div>
+              )}
+              {messages.map((message) => (
+                <div key={message.id} className={`message ${message.sender}`}>
+                  <div className="message-content">
+                    {message.sender === "tool" ? (
+                      <React.Fragment>
+                        <div
+                          className="tool-header"
+                          onClick={() => toggleToolDetails(message.id)}
+                        >
+                          <span
+                            className={`tool-icon ${
+                              expandedTools[message.id] ? "expanded" : ""
+                            }`}
+                          >
+                            ▶
+                          </span>
+                          {message.title}
+                        </div>
+                        <div
+                          className={`tool-details ${
+                            expandedTools[message.id] ? "expanded" : ""
+                          }`}
+                        >
+                          {message.details}
+                        </div>
+                        <div className="message-time">{message.time}</div>
+                      </React.Fragment>
+                    ) : (
+                      <React.Fragment>
+                        {message.isStreaming
+                          ? renderStreamingText(message.text)
+                          : message.text &&
+                            message.text.split("\n").map((line, i) => (
+                              <React.Fragment key={i}>
+                                {line}
+                                {i < message.text.split("\n").length - 1 && (
+                                  <br />
+                                )}
+                              </React.Fragment>
+                            ))}
+                        <div className="message-time">{message.time}</div>
+                      </React.Fragment>
+                    )}
+                  </div>
+                </div>
+              ))}
+              {isTyping && (
+                <div className="typing-indicator">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              )}
+              {isToolRunning && (
+                <div className="tool-progress">
+                  <div
+                    className="tool-progress-bar"
+                    style={{ width: `${toolProgress}%` }}
+                  ></div>
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+            <div className="chat-input">
+              <input
+                type="text"
+                value={inputText}
+                onChange={handleInputChange}
+                onKeyPress={handleKeyPress}
+                placeholder="输入消息..."
+              />
+              <button onClick={handleSendMessage}>发送</button>
+            </div>
+          </div>
+        );
+      }
 
-			// 渲染应用
-			const root = ReactDOM.createRoot(document.getElementById("root"));
-			root.render(<ChatApp />);
-		</script>
-	</body>
+      // 渲染应用
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<ChatApp />);
+    </script>
+  </body>
 </html>

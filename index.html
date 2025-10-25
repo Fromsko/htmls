@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI 导航中心</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css"
+    />
+    <style>
+      /* ===== 全局样式 ===== */
+      * {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      body {
+        background: linear-gradient(
+          135deg,
+          #0f172a 0%,
+          #1a1a2e 50%,
+          #16213e 100%
+        );
+        min-height: 100vh;
+        color: #f1f5f9;
+      }
+
+      /* ===== 导航栏样式 ===== */
+      nav {
+        background: rgba(15, 23, 42, 0.95);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+        border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        backdrop-filter: blur(10px);
+      }
+
+      nav a {
+        position: relative;
+        color: #cbd5e1;
+        font-weight: 500;
+        transition: color 0.3s ease;
+      }
+
+      nav a:hover {
+        color: #60a5fa;
+      }
+
+      nav a::after {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -6px;
+        left: 0;
+        background: linear-gradient(90deg, #60a5fa, #34a853);
+        transition: width 0.3s ease;
+      }
+
+      nav a:hover::after {
+        width: 100%;
+      }
+
+      /* ===== 卡片样式 ===== */
+      .nav-card {
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        background: rgba(30, 41, 59, 0.8);
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .nav-card:hover {
+        transform: translateY(-4px);
+        background: rgba(30, 41, 59, 0.95);
+        border-color: rgba(96, 165, 250, 0.3);
+        box-shadow: 0 8px 24px rgba(96, 165, 250, 0.15);
+      }
+
+      .nav-card h3 {
+        color: #f1f5f9;
+        font-weight: 600;
+      }
+
+      .nav-card p {
+        color: #cbd5e1;
+      }
+
+      .nav-card .text-xs {
+        color: #64748b;
+      }
+
+      /* ===== Icon 样式 ===== */
+      .icon-box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        background: rgba(96, 165, 250, 0.1);
+        border-radius: 0.5rem;
+        border: 1px solid rgba(96, 165, 250, 0.2);
+        transition: all 0.3s ease;
+      }
+
+      .nav-card:hover .icon-box {
+        transform: scale(1.1);
+        background: rgba(96, 165, 250, 0.2);
+        border-color: rgba(96, 165, 250, 0.4);
+        box-shadow: 0 0 12px rgba(96, 165, 250, 0.2);
+      }
+
+      .brand-icon {
+        width: 1.5rem;
+        height: 1.5rem;
+        object-fit: contain;
+        filter: brightness(0.95);
+      }
+
+      /* ===== 标题样式 ===== */
+      h2 {
+        color: #f1f5f9;
+        font-weight: 600;
+      }
+
+      section p {
+        color: #cbd5e1;
+      }
+
+      /* ===== 页脚样式 ===== */
+      footer {
+        background: rgba(15, 23, 42, 0.95);
+        border-top: 1px solid rgba(148, 163, 184, 0.1);
+      }
+
+      footer p {
+        color: #cbd5e1;
+      }
+
+      /* ===== 快速访问按钮 ===== */
+      .quick-access-btn {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        width: 3.5rem;
+        height: 3.5rem;
+        background: linear-gradient(135deg, #60a5fa, #34a853);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 6px 20px rgba(96, 165, 250, 0.4);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: white;
+        font-size: 1.5rem;
+        z-index: 50;
+        border: none;
+      }
+
+      .quick-access-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 8px 28px rgba(96, 165, 250, 0.6);
+      }
+
+      .quick-access-btn:active {
+        transform: scale(0.95);
+      }
+
+      /* ===== 渐变文字 ===== */
+      .gradient-text {
+        background: linear-gradient(90deg, #60a5fa, #34a853);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      /* ===== 动画 ===== */
+      .glow {
+        color: #60a5fa;
+        animation: pulse-glow 2s infinite;
+      }
+
+      @keyframes pulse-glow {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.6;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 顶部导航栏 -->
+    <nav class="sticky top-0 z-50 animate__animated animate__slideInDown">
+      <div
+        class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center"
+      >
+        <div class="text-2xl font-light tracking-tight">
+          <span class="gradient-text font-bold">AI</span> 导航
+        </div>
+        <div class="flex gap-8">
+          <a href="#ai" class="text-sm">AI 工具</a>
+          <a href="#ui" class="text-sm">UI 框架</a>
+          <a href="#editor" class="text-sm">AI 编辑器</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- 主内容区域 -->
+    <div class="max-w-6xl mx-auto px-6 py-16">
+      <!-- 主流 AI 工具 -->
+      <section id="ai" class="mb-20">
+        <h2
+          class="text-4xl font-bold mb-4 animate__animated animate__fadeInLeft"
+        >
+          主流 AI 工具
+        </h2>
+        <p
+          class="text-gray-400 mb-12 animate__animated animate__fadeInLeft"
+          style="animation-delay: 0.1s"
+        >
+          探索最前沿的人工智能工具和平台
+        </p>
+        <div
+          id="ai-tools"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        ></div>
+      </section>
+
+      <!-- 主流 UI 框架 -->
+      <section id="ui" class="mb-20">
+        <h2
+          class="text-4xl font-bold mb-4 animate__animated animate__fadeInLeft"
+        >
+          主流 UI 框架
+        </h2>
+        <p
+          class="text-gray-400 mb-12 animate__animated animate__fadeInLeft"
+          style="animation-delay: 0.1s"
+        >
+          现代化的前端 UI 框架和组件库
+        </p>
+        <div
+          id="ui-frameworks"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        ></div>
+      </section>
+
+      <!-- 主流 AI 编辑器 -->
+      <section id="editor">
+        <h2
+          class="text-4xl font-bold mb-4 animate__animated animate__fadeInLeft"
+        >
+          主流 AI 编辑器
+        </h2>
+        <p
+          class="text-gray-400 mb-12 animate__animated animate__fadeInLeft"
+          style="animation-delay: 0.1s"
+        >
+          智能化的代码编辑工具和开发环境
+        </p>
+        <div
+          id="ai-editors"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        ></div>
+      </section>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="mt-20 pt-12 pb-12 animate__animated animate__fadeInUp">
+      <div class="max-w-6xl mx-auto px-6 text-center">
+        <p class="text-sm mb-2">AI 导航中心 © 2025</p>
+        <p class="text-xs text-gray-500">
+          汇聚最主流的 AI 工具、UI 框架和编辑器
+        </p>
+      </div>
+    </footer>
+
+    <!-- 快速访问聊天按钮 -->
+    <a href="./chat.html" class="quick-access-btn" title="快速访问聊天">
+      <i class="fas fa-comments"></i>
+    </a>
+
+    <!-- 库和脚本 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+
+    <script>
+      // ===== 数据模块 =====
+      const navData = {
+        aiTools: [
+          {
+            name: "ChatGPT",
+            desc: "OpenAI 的 AI 对话助手",
+            url: "https://chatgpt.com",
+            icon: "openai",
+            featured: true,
+          },
+          {
+            name: "Claude",
+            desc: "Anthropic 的 AI 助手",
+            url: "https://claude.ai",
+            icon: "anthropic",
+          },
+          {
+            name: "Google Gemini",
+            desc: "Google 的多模态 AI 模型",
+            url: "https://gemini.google.com",
+            icon: "google",
+          },
+          {
+            name: "Midjourney",
+            desc: "AI 图像生成工具",
+            url: "https://www.midjourney.com",
+            icon: "midjourney",
+          },
+          {
+            name: "Stability AI",
+            desc: "开源 AI 模型平台",
+            url: "https://stability.ai",
+            icon: "stabilityai",
+          },
+          {
+            name: "Perplexity",
+            desc: "AI 搜索引擎",
+            url: "https://www.perplexity.ai",
+            icon: "perplexity",
+          },
+        ],
+        uiFrameworks: [
+          {
+            name: "Tailwind CSS",
+            desc: "实用优先的 CSS 框架",
+            url: "https://tailwindcss.com",
+            icon: "tailwindcss",
+            featured: true,
+          },
+          {
+            name: "Bootstrap",
+            desc: "响应式前端框架",
+            url: "https://getbootstrap.com",
+            icon: "bootstrap",
+          },
+          {
+            name: "Material-UI",
+            desc: "React UI 组件库",
+            url: "https://mui.com",
+            icon: "materialui",
+          },
+          {
+            name: "Ant Design",
+            desc: "企业级 UI 设计体系",
+            url: "https://ant.design",
+            icon: "antdesign",
+          },
+          {
+            name: "Chakra UI",
+            desc: "React 组件库",
+            url: "https://chakra-ui.com",
+            icon: "chakraui",
+          },
+          {
+            name: "Element Plus",
+            desc: "Vue 3 组件库",
+            url: "https://element-plus.org",
+            icon: "elementui",
+          },
+        ],
+        aiEditors: [
+          {
+            name: "Trae",
+            desc: "字节跳动 AI 编程 IDE",
+            url: "https://trae.io",
+            favicon: "trae.io",
+            featured: true,
+          },
+          {
+            name: "CodeBuddy",
+            desc: "腾讯 AI 编程助手",
+            url: "https://copilot.tencent.com",
+            favicon: "copilot.tencent.com",
+          },
+          {
+            name: "Qoder",
+            desc: "阿里 AI 编程工具",
+            url: "https://qoder.aliyun.com",
+            favicon: "qoder.aliyun.com",
+          },
+          {
+            name: "VS Code",
+            desc: "微软开源代码编辑器",
+            url: "https://code.visualstudio.com",
+            icon: "visualstudiocode",
+            featured: true,
+          },
+          {
+            name: "GitHub Copilot",
+            desc: "AI 代码助手",
+            url: "https://github.com/features/copilot",
+            icon: "github",
+          },
+          {
+            name: "Cursor",
+            desc: "基于 AI 的代码编辑器",
+            url: "https://www.cursor.com",
+            icon: "cursor",
+          },
+        ],
+      };
+
+      // ===== 卡片渲染模块 =====
+      const renderCard = (item, index, hasIcon = true) => {
+        const featured = item.featured ? " featured-card" : "";
+        const delay = index * 100;
+
+        let iconHtml = "";
+        if (hasIcon && item.icon) {
+          iconHtml = `<img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/${item.icon}.svg" alt="${item.name}" class="brand-icon" />`;
+        } else if (item.favicon) {
+          iconHtml = `<img src="" alt="${
+            item.name
+          }" class="brand-icon favicon-icon" data-domain="${
+            item.favicon
+          }" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%2360a5fa%22/><text x=%2250%22 y=%2260%22 font-size=%2245%22 fill=%22white%22 text-anchor=%22middle%22>${item.name.charAt(
+            0
+          )}</text></svg>'" />`;
+        }
+
+        return `
+          <a href="${item.url}" target="_blank" class="group" data-aos="fade-up" data-aos-duration="600" data-aos-delay="${delay}">
+            <div class="nav-card rounded-lg p-6${featured}">
+              <div class="icon-box mb-4">${iconHtml}</div>
+              <h3 class="text-lg font-bold mb-2">${item.name}</h3>
+              <p class="text-sm mb-4">${item.desc}</p>
+              <p class="text-xs">${item.url}</p>
+            </div>
+          </a>
+        `;
+      };
+
+      // ===== DOM 初始化模块 =====
+      const initializeDOM = () => {
+        const aiToolsContainer = document.getElementById("ai-tools");
+        const uiFrameworksContainer = document.getElementById("ui-frameworks");
+        const aiEditorsContainer = document.getElementById("ai-editors");
+
+        navData.aiTools.forEach((item, i) => {
+          aiToolsContainer.innerHTML += renderCard(item, i, true);
+        });
+
+        navData.uiFrameworks.forEach((item, i) => {
+          uiFrameworksContainer.innerHTML += renderCard(item, i, true);
+        });
+
+        navData.aiEditors.forEach((item, i) => {
+          aiEditorsContainer.innerHTML += renderCard(
+            item,
+            i,
+            item.icon ? true : false
+          );
+        });
+      };
+
+      // ===== Favicon 加载模块 =====
+      const loadFavicons = () => {
+        const faviconIcons = document.querySelectorAll(".favicon-icon");
+        faviconIcons.forEach((img) => {
+          const domain = img.dataset.domain;
+          if (!domain) return;
+
+          const faviconApis = [
+            `https://icon.horse/icon/${domain}`,
+            `https://www.google.com/s2/favicons?sz=256&domain=${domain}`,
+            `https://favicons.githubusercontent.com/${domain}`,
+          ];
+
+          let loaded = false;
+          for (const api of faviconApis) {
+            const tempImg = new Image();
+            tempImg.onload = function () {
+              if (!loaded) {
+                img.src = api;
+                loaded = true;
+              }
+            };
+            tempImg.onerror = function () {};
+            tempImg.src = api;
+          }
+        });
+      };
+
+      // ===== AOS 初始化模块 =====
+      const initAOS = () => {
+        AOS.init({
+          duration: 800,
+          easing: "ease-in-out",
+          once: true,
+          offset: 100,
+        });
+      };
+
+      // ===== Service Worker 注册模块 =====
+      const registerServiceWorker = () => {
+        if ("serviceWorker" in navigator) {
+          window.addEventListener("load", function () {
+            navigator.serviceWorker
+              .register("./service-worker.js")
+              .then(function (registration) {
+                console.log("Service Worker 注册成功");
+              })
+              .catch(function (error) {
+                console.log("Service Worker 注册失败:", error);
+              });
+          });
+        }
+      };
+
+      // ===== 主初始化函数 =====
+      document.addEventListener("DOMContentLoaded", () => {
+        initializeDOM();
+        loadFavicons();
+        initAOS();
+        registerServiceWorker();
+      });
+    </script>
+  </body>
+</html>
