@@ -103,7 +103,7 @@ The main navigation center showcasing AI tools, UI frameworks, and AI editors.
 
 ![Index Full.Jpg](./screenshots/index-full.jpg)
 
-_Captured with Playwright on: 2026-02-23_
+_Captured with Playwright on: 2026-03-02_
 
 ### 💬 Chat Page (Conversation Interface)
 
@@ -113,7 +113,7 @@ The AI chat assistant interface for interactive conversations.
 
 ![Chat Full.Jpg](./screenshots/chat-full.jpg)
 
-_Captured with Playwright on: 2026-02-23_
+_Captured with Playwright on: 2026-03-02_
 
 ### 📱 Responsive Design
 
@@ -123,19 +123,19 @@ Screenshots showing the responsive design across different device sizes.
 
 ![Responsive Desktop.Jpg](./screenshots/responsive-desktop.jpg)
 
-_Captured with Playwright on: 2026-02-23_
+_Captured with Playwright on: 2026-03-02_
 
 #### Responsive Mobile.Jpg
 
 ![Responsive Mobile.Jpg](./screenshots/responsive-mobile.jpg)
 
-_Captured with Playwright on: 2026-02-23_
+_Captured with Playwright on: 2026-03-02_
 
 #### Responsive Tablet.Jpg
 
 ![Responsive Tablet.Jpg](./screenshots/responsive-tablet.jpg)
 
-_Captured with Playwright on: 2026-02-23_
+_Captured with Playwright on: 2026-03-02_
 
 <!-- PLAYWRIGHT_SCREENSHOTS_END -->
 
@@ -291,6 +291,6 @@ _Captured with Playwright on: 2026-02-23_
 
 ---
 
-**最后更新**: 2026-02-23
+**最后更新**: 2026-03-02
 **版本**: 1.0.0  
 **状态**: ✅ 活跃维护中
